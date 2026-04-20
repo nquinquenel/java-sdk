@@ -77,6 +77,24 @@ The `Tool` record now models `inputSchema` (and `outputSchema`) as arbitrary JSO
 - Java code that used `Tool.inputSchema()` as a `JsonSchema` must switch to `Map<String, Object>` (or copy into your own schema wrapper).
 - `Tool.Builder.inputSchema(JsonSchema)` remains as a **deprecated** helper that maps the old record into a map; prefer `inputSchema(Map)` or `inputSchema(McpJsonMapper, String)`.
 
+### Required MCP spec fields are now guarded against `null` at construction time
+
+The following records now assert that their required fields (as mandated by the MCP specification) are non-null at construction time. Passing `null` for any of these fields throws `IllegalArgumentException` immediately, rather than producing a structurally invalid object that fails later during serialization or protocol handling.
+
+| Record | Required (non-null) fields |
+|--------|---------------------------|
+| `JSONRPCResponse.JSONRPCError` | `code`, `message` |
+| `CallToolResult` | `content` |
+| `SamplingMessage` | `role`, `content` |
+| `CreateMessageRequest` | `messages`, `maxTokens` |
+| `ElicitRequest` | `message`, `requestedSchema` |
+| `ProgressNotification` | `progressToken`, `progress` |
+| `LoggingMessageNotification` | `level`, `data` |
+
+**Action:** Audit any code that constructs these records with potentially-null values and provide valid, non-null arguments. Code paths that previously silently produced malformed wire messages will now fail fast at the construction site.
+
+**Note on `LoggingMessageNotification.level`:** Because `LoggingLevel` deserialization is lenient (unknown strings produce `null` — see the section above), inbound notifications with an unrecognized level will fail to deserialize into a `LoggingMessageNotification`. Ensure clients and servers send only recognized level strings.
+
 ### Optional JSON Schema validation on `tools/call` (server)
 
 When a `JsonSchemaValidator` is available (including the default from `McpJsonDefaults.getSchemaValidator()` when you do not configure one explicitly) and `validateToolInputs` is left at its default of `true`, the server validates incoming tool arguments against `tool.inputSchema()` before invoking the tool. Failed validation produces a `CallToolResult` with `isError` set and a textual error in the content.
