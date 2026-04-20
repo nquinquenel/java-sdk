@@ -1427,6 +1427,7 @@ public class McpSchemaTests {
 	@Test
 	void testCreateElicitationRequest() throws Exception {
 		McpSchema.ElicitRequest request = McpSchema.ElicitRequest.builder()
+			.message("Please provide additional information")
 			.requestedSchema(Map.of("type", "object", "required", List.of("a"), "properties",
 					Map.of("foo", Map.of("type", "string"))))
 			.build();
@@ -1436,8 +1437,9 @@ public class McpSchemaTests {
 		assertThatJson(value).when(Option.IGNORING_ARRAY_ORDER)
 			.when(Option.IGNORING_EXTRA_ARRAY_ITEMS)
 			.isObject()
-			.isEqualTo(json("""
-					{"requestedSchema":{"properties":{"foo":{"type":"string"}},"required":["a"],"type":"object"}}"""));
+			.isEqualTo(
+					json("""
+							{"message":"Please provide additional information","requestedSchema":{"properties":{"foo":{"type":"string"}},"required":["a"],"type":"object"}}"""));
 	}
 
 	@Test

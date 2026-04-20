@@ -171,6 +171,7 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
+					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest)
@@ -250,6 +251,7 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
+					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest)
@@ -325,6 +327,7 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
+					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest).thenReturn(callResponse);

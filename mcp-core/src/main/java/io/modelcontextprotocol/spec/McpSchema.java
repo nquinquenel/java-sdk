@@ -296,6 +296,11 @@ public final class McpSchema {
 			@JsonProperty("code") Integer code,
 			@JsonProperty("message") String message,
 			@JsonProperty("data") Object data) { // @formatter:on
+
+			public JSONRPCError {
+				Assert.notNull(code, "code must not be null");
+				Assert.notNull(message, "message must not be null");
+			}
 		}
 	}
 
@@ -1573,6 +1578,10 @@ public final class McpSchema {
 		@JsonProperty("structuredContent") Object structuredContent,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
 
+		public CallToolResult {
+			Assert.notNull(content, "content must not be null");
+		}
+
 		/**
 		 * Creates a builder for {@link CallToolResult}.
 		 * @return a new builder instance
@@ -1797,6 +1806,11 @@ public final class McpSchema {
 	public record SamplingMessage( // @formatter:off
 		@JsonProperty("role") Role role,
 		@JsonProperty("content") Content content) { // @formatter:on
+
+		public SamplingMessage {
+			Assert.notNull(role, "role must not be null");
+			Assert.notNull(content, "content must not be null");
+		}
 	}
 
 	/**
@@ -1833,6 +1847,11 @@ public final class McpSchema {
 		@JsonProperty("stopSequences") List<String> stopSequences,
 		@JsonProperty("metadata") Map<String, Object> metadata,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
+
+		public CreateMessageRequest {
+			Assert.notNull(messages, "messages must not be null");
+			Assert.notNull(maxTokens, "maxTokens must not be null");
+		}
 
 		// backwards compatibility constructor
 		public CreateMessageRequest(List<SamplingMessage> messages, ModelPreferences modelPreferences,
@@ -2063,6 +2082,11 @@ public final class McpSchema {
 		@JsonProperty("requestedSchema") Map<String, Object> requestedSchema,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public ElicitRequest {
+			Assert.notNull(message, "message must not be null");
+			Assert.notNull(requestedSchema, "requestedSchema must not be null");
+		}
+
 		// backwards compatibility constructor
 		public ElicitRequest(String message, Map<String, Object> requestedSchema) {
 			this(message, requestedSchema, null);
@@ -2239,6 +2263,11 @@ public final class McpSchema {
 		@JsonProperty("message") String message,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Notification { // @formatter:on
 
+		public ProgressNotification {
+			Assert.notNull(progressToken, "progressToken must not be null");
+			Assert.notNull(progress, "progress must not be null");
+		}
+
 		public ProgressNotification(Object progressToken, double progress, Double total, String message) {
 			this(progressToken, progress, total, message, null);
 		}
@@ -2280,6 +2309,11 @@ public final class McpSchema {
 		@JsonProperty("logger") String logger,
 		@JsonProperty("data") String data,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Notification { // @formatter:on
+
+		public LoggingMessageNotification {
+			Assert.notNull(level, "level must not be null");
+			Assert.notNull(data, "data must not be null");
+		}
 
 		// backwards compatibility constructor
 		public LoggingMessageNotification(LoggingLevel level, String logger, String data) {

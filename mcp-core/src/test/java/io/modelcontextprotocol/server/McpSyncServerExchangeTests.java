@@ -303,6 +303,7 @@ class McpSyncServerExchangeTests {
 
 		McpSchema.ElicitRequest elicitRequest = McpSchema.ElicitRequest.builder()
 			.message("Please provide your name")
+			.requestedSchema(Map.of("type", "object"))
 			.build();
 
 		assertThatThrownBy(() -> exchangeWithNullCapabilities.createElicitation(elicitRequest))
@@ -326,6 +327,7 @@ class McpSyncServerExchangeTests {
 
 		McpSchema.ElicitRequest elicitRequest = McpSchema.ElicitRequest.builder()
 			.message("Please provide your name")
+			.requestedSchema(Map.of("type", "object"))
 			.build();
 
 		assertThatThrownBy(() -> exchangeWithoutElicitation.createElicitation(elicitRequest))
@@ -394,6 +396,7 @@ class McpSyncServerExchangeTests {
 
 		McpSchema.ElicitRequest elicitRequest = McpSchema.ElicitRequest.builder()
 			.message("Please provide sensitive information")
+			.requestedSchema(Map.of("type", "object"))
 			.build();
 
 		McpSchema.ElicitResult expectedResult = McpSchema.ElicitResult.builder()
@@ -422,6 +425,7 @@ class McpSyncServerExchangeTests {
 
 		McpSchema.ElicitRequest elicitRequest = McpSchema.ElicitRequest.builder()
 			.message("Please provide your information")
+			.requestedSchema(Map.of("type", "object"))
 			.build();
 
 		McpSchema.ElicitResult expectedResult = McpSchema.ElicitResult.builder()
@@ -450,6 +454,7 @@ class McpSyncServerExchangeTests {
 
 		McpSchema.ElicitRequest elicitRequest = McpSchema.ElicitRequest.builder()
 			.message("Please provide your name")
+			.requestedSchema(Map.of("type", "object"))
 			.build();
 
 		when(mockSession.sendRequest(eq(McpSchema.METHOD_ELICITATION_CREATE), eq(elicitRequest), any(TypeRef.class)))
@@ -475,6 +480,7 @@ class McpSyncServerExchangeTests {
 		McpSchema.CreateMessageRequest createMessageRequest = McpSchema.CreateMessageRequest.builder()
 			.messages(Arrays
 				.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Hello, world!"))))
+			.maxTokens(1000)
 			.build();
 
 		assertThatThrownBy(() -> exchangeWithNullCapabilities.createMessage(createMessageRequest))
@@ -500,6 +506,7 @@ class McpSyncServerExchangeTests {
 		McpSchema.CreateMessageRequest createMessageRequest = McpSchema.CreateMessageRequest.builder()
 			.messages(Arrays
 				.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Hello, world!"))))
+			.maxTokens(1000)
 			.build();
 
 		assertThatThrownBy(() -> exchangeWithoutSampling.createMessage(createMessageRequest))
@@ -525,6 +532,7 @@ class McpSyncServerExchangeTests {
 		McpSchema.CreateMessageRequest createMessageRequest = McpSchema.CreateMessageRequest.builder()
 			.messages(Arrays
 				.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Hello, world!"))))
+			.maxTokens(1000)
 			.build();
 
 		McpSchema.CreateMessageResult expectedResult = McpSchema.CreateMessageResult.builder()
@@ -564,6 +572,7 @@ class McpSyncServerExchangeTests {
 			.messages(Arrays.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER,
 					new McpSchema.ImageContent(null, "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD...",
 							"image/jpeg"))))
+			.maxTokens(1000)
 			.build();
 
 		McpSchema.CreateMessageResult expectedResult = McpSchema.CreateMessageResult.builder()
@@ -598,6 +607,7 @@ class McpSyncServerExchangeTests {
 		McpSchema.CreateMessageRequest createMessageRequest = McpSchema.CreateMessageRequest.builder()
 			.messages(Arrays
 				.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER, new McpSchema.TextContent("Hello"))))
+			.maxTokens(1000)
 			.build();
 
 		when(mockSession.sendRequest(eq(McpSchema.METHOD_SAMPLING_CREATE_MESSAGE), eq(createMessageRequest),
@@ -624,6 +634,7 @@ class McpSyncServerExchangeTests {
 			.messages(Arrays.asList(new McpSchema.SamplingMessage(McpSchema.Role.USER,
 					new McpSchema.TextContent("What files are available?"))))
 			.includeContext(McpSchema.CreateMessageRequest.ContextInclusionStrategy.ALL_SERVERS)
+			.maxTokens(1000)
 			.build();
 
 		McpSchema.CreateMessageResult expectedResult = McpSchema.CreateMessageResult.builder()
