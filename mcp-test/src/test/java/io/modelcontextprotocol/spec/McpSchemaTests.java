@@ -133,13 +133,12 @@ public class McpSchemaTests {
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("progressToken", "create-message-token-456");
 
-		McpSchema.CreateMessageRequest request = McpSchema.CreateMessageRequest.builder()
-			.messages(Collections.singletonList(message))
+		McpSchema.CreateMessageRequest request = McpSchema.CreateMessageRequest
+			.builder(Collections.singletonList(message), 1000)
 			.modelPreferences(preferences)
 			.systemPrompt("You are a helpful assistant")
 			.includeContext(McpSchema.CreateMessageRequest.ContextInclusionStrategy.THIS_SERVER)
 			.temperature(0.7)
-			.maxTokens(1000)
 			.stopSequences(Arrays.asList("STOP", "END"))
 			.metadata(metadata)
 			.meta(meta)
@@ -1363,13 +1362,12 @@ public class McpSchemaTests {
 		Map<String, Object> metadata = new HashMap<>();
 		metadata.put("session", "test-session");
 
-		McpSchema.CreateMessageRequest request = McpSchema.CreateMessageRequest.builder()
-			.messages(Collections.singletonList(message))
+		McpSchema.CreateMessageRequest request = McpSchema.CreateMessageRequest
+			.builder(Collections.singletonList(message), 1000)
 			.modelPreferences(preferences)
 			.systemPrompt("You are a helpful assistant")
 			.includeContext(McpSchema.CreateMessageRequest.ContextInclusionStrategy.THIS_SERVER)
 			.temperature(0.7)
-			.maxTokens(1000)
 			.stopSequences(Arrays.asList("STOP", "END"))
 			.metadata(metadata)
 			.build();
@@ -1426,10 +1424,9 @@ public class McpSchemaTests {
 
 	@Test
 	void testCreateElicitationRequest() throws Exception {
-		McpSchema.ElicitRequest request = McpSchema.ElicitRequest.builder()
-			.message("Please provide additional information")
-			.requestedSchema(Map.of("type", "object", "required", List.of("a"), "properties",
-					Map.of("foo", Map.of("type", "string"))))
+		McpSchema.ElicitRequest request = McpSchema.ElicitRequest
+			.builder("Please provide additional information", Map.of("type", "object", "required", List.of("a"),
+					"properties", Map.of("foo", Map.of("type", "string"))))
 			.build();
 
 		String value = JSON_MAPPER.writeValueAsString(request);
@@ -1466,9 +1463,7 @@ public class McpSchemaTests {
 		Map<String, Object> meta = new HashMap<>();
 		meta.put("progressToken", "elicit-token-789");
 
-		McpSchema.ElicitRequest request = McpSchema.ElicitRequest.builder()
-			.message("Please provide your name")
-			.requestedSchema(requestedSchema)
+		McpSchema.ElicitRequest request = McpSchema.ElicitRequest.builder("Please provide your name", requestedSchema)
 			.meta(meta)
 			.build();
 

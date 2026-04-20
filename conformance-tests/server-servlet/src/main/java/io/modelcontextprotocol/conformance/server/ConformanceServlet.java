@@ -237,17 +237,14 @@ public class ConformanceServlet {
 					.callHandler((exchange, request) -> {
 						logger.info("Tool 'test_tool_with_logging' called");
 						// Send log notifications
-						exchange.loggingNotification(LoggingMessageNotification.builder()
-							.level(LoggingLevel.INFO)
-							.data("Tool execution started")
+						exchange.loggingNotification(LoggingMessageNotification
+							.builder(LoggingLevel.INFO, "Tool execution started")
 							.build());
-						exchange.loggingNotification(LoggingMessageNotification.builder()
-							.level(LoggingLevel.INFO)
-							.data("Tool processing data")
+						exchange.loggingNotification(LoggingMessageNotification
+							.builder(LoggingLevel.INFO, "Tool processing data")
 							.build());
-						exchange.loggingNotification(LoggingMessageNotification.builder()
-							.level(LoggingLevel.INFO)
-							.data("Tool execution completed")
+						exchange.loggingNotification(LoggingMessageNotification
+							.builder(LoggingLevel.INFO, "Tool execution completed")
 							.build());
 						return CallToolResult.builder()
 							.content(List.of(new TextContent("Tool execution completed with logging")))
@@ -335,9 +332,8 @@ public class ConformanceServlet {
 						String prompt = (String) request.arguments().get("prompt");
 
 						// Request sampling from client
-						CreateMessageRequest samplingRequest = CreateMessageRequest.builder()
-							.messages(List.of(new SamplingMessage(Role.USER, new TextContent(prompt))))
-							.maxTokens(100)
+						CreateMessageRequest samplingRequest = CreateMessageRequest
+							.builder(List.of(new SamplingMessage(Role.USER, new TextContent(prompt))), 100)
 							.build();
 
 						CreateMessageResult response = exchange.createMessage(samplingRequest);

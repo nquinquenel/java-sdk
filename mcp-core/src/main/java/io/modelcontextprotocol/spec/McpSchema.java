@@ -301,6 +301,36 @@ public final class McpSchema {
 				Assert.notNull(code, "code must not be null");
 				Assert.notNull(message, "message must not be null");
 			}
+
+			public static Builder builder(int code, String message) {
+				return new Builder(code, message);
+			}
+
+			public static class Builder {
+
+				private final Integer code;
+
+				private final String message;
+
+				private Object data;
+
+				private Builder(int code, String message) {
+					Assert.notNull(message, "message must not be null");
+					this.code = code;
+					this.message = message;
+				}
+
+				public Builder data(Object data) {
+					this.data = data;
+					return this;
+				}
+
+				public JSONRPCError build() {
+					return new JSONRPCError(code, message, data);
+				}
+
+			}
+
 		}
 	}
 
@@ -1599,6 +1629,14 @@ public final class McpSchema {
 
 			private Boolean isError = false;
 
+			/**
+			 * @deprecated Use {@link CallToolResult#builder()} factory method instead of
+			 * instantiating the builder directly.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
 			private Object structuredContent;
 
 			private Map<String, Object> meta;
@@ -1692,6 +1730,7 @@ public final class McpSchema {
 			 * @return a new CallToolResult instance
 			 */
 			public CallToolResult build() {
+				Assert.notNull(content, "content must not be null");
 				return new CallToolResult(content, isError, structuredContent, meta);
 			}
 
@@ -1870,8 +1909,16 @@ public final class McpSchema {
 
 		}
 
+		/**
+		 * @deprecated Use {@link #builder(List, int)} instead.
+		 */
+		@Deprecated
 		public static Builder builder() {
 			return new Builder();
+		}
+
+		public static Builder builder(List<SamplingMessage> messages, int maxTokens) {
+			return new Builder(messages, maxTokens);
 		}
 
 		public static class Builder {
@@ -1894,7 +1941,22 @@ public final class McpSchema {
 
 			private Map<String, Object> meta;
 
+			/**
+			 * @deprecated Use {@link CreateMessageRequest#builder(List, int)} factory
+			 * method instead.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
+			private Builder(List<SamplingMessage> messages, int maxTokens) {
+				Assert.notNull(messages, "messages must not be null");
+				this.messages = messages;
+				this.maxTokens = maxTokens;
+			}
+
 			public Builder messages(List<SamplingMessage> messages) {
+				Assert.notNull(messages, "messages must not be null");
 				this.messages = messages;
 				return this;
 			}
@@ -2092,8 +2154,16 @@ public final class McpSchema {
 			this(message, requestedSchema, null);
 		}
 
+		/**
+		 * @deprecated Use {@link #builder(String, Map)} instead.
+		 */
+		@Deprecated
 		public static Builder builder() {
 			return new Builder();
+		}
+
+		public static Builder builder(String message, Map<String, Object> requestedSchema) {
+			return new Builder(message, requestedSchema);
 		}
 
 		public static class Builder {
@@ -2104,12 +2174,29 @@ public final class McpSchema {
 
 			private Map<String, Object> meta;
 
+			/**
+			 * @deprecated Use {@link ElicitRequest#builder(String, Map)} factory method
+			 * instead.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
+			private Builder(String message, Map<String, Object> requestedSchema) {
+				Assert.notNull(message, "message must not be null");
+				Assert.notNull(requestedSchema, "requestedSchema must not be null");
+				this.message = message;
+				this.requestedSchema = requestedSchema;
+			}
+
 			public Builder message(String message) {
+				Assert.notNull(message, "message must not be null");
 				this.message = message;
 				return this;
 			}
 
 			public Builder requestedSchema(Map<String, Object> requestedSchema) {
+				Assert.notNull(requestedSchema, "requestedSchema must not be null");
 				this.requestedSchema = requestedSchema;
 				return this;
 			}
@@ -2271,6 +2358,50 @@ public final class McpSchema {
 		public ProgressNotification(Object progressToken, double progress, Double total, String message) {
 			this(progressToken, progress, total, message, null);
 		}
+
+		public static Builder builder(Object progressToken, double progress) {
+			return new Builder(progressToken, progress);
+		}
+
+		public static class Builder {
+
+			private final Object progressToken;
+
+			private final Double progress;
+
+			private Double total;
+
+			private String message;
+
+			private Map<String, Object> meta;
+
+			private Builder(Object progressToken, double progress) {
+				Assert.notNull(progressToken, "progressToken must not be null");
+				this.progressToken = progressToken;
+				this.progress = progress;
+			}
+
+			public Builder total(Double total) {
+				this.total = total;
+				return this;
+			}
+
+			public Builder message(String message) {
+				this.message = message;
+				return this;
+			}
+
+			public Builder meta(Map<String, Object> meta) {
+				this.meta = meta;
+				return this;
+			}
+
+			public ProgressNotification build() {
+				return new ProgressNotification(progressToken, progress, total, message, meta);
+			}
+
+		}
+
 	}
 
 	/**
@@ -2320,8 +2451,16 @@ public final class McpSchema {
 			this(level, logger, data, null);
 		}
 
+		/**
+		 * @deprecated Use {@link #builder(LoggingLevel, String)} instead.
+		 */
+		@Deprecated
 		public static Builder builder() {
 			return new Builder();
+		}
+
+		public static Builder builder(LoggingLevel level, String data) {
+			return new Builder(level, data);
 		}
 
 		public static class Builder {
@@ -2334,7 +2473,24 @@ public final class McpSchema {
 
 			private Map<String, Object> meta;
 
+			/**
+			 * @deprecated Use
+			 * {@link LoggingMessageNotification#builder(LoggingLevel, String)} factory
+			 * method instead.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
+			private Builder(LoggingLevel level, String data) {
+				Assert.notNull(level, "level must not be null");
+				Assert.notNull(data, "data must not be null");
+				this.level = level;
+				this.data = data;
+			}
+
 			public Builder level(LoggingLevel level) {
+				Assert.notNull(level, "level must not be null");
 				this.level = level;
 				return this;
 			}
@@ -2345,6 +2501,7 @@ public final class McpSchema {
 			}
 
 			public Builder data(String data) {
+				Assert.notNull(data, "data must not be null");
 				this.data = data;
 				return this;
 			}

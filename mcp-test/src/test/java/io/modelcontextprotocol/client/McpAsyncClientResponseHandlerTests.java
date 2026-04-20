@@ -417,9 +417,9 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock elicitation
-		var elicitRequest = McpSchema.ElicitRequest.builder()
-			.message("Test message")
-			.requestedSchema(Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
+		var elicitRequest = McpSchema.ElicitRequest
+			.builder("Test message",
+					Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
 			.build();
 
 		// Simulate incoming request
@@ -462,9 +462,9 @@ class McpAsyncClientResponseHandlerTests {
 		assertThat(asyncMcpClient.initialize().block()).isNotNull();
 
 		// Create a mock elicitation
-		var elicitRequest = McpSchema.ElicitRequest.builder()
-			.message("Test message")
-			.requestedSchema(Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
+		var elicitRequest = McpSchema.ElicitRequest
+			.builder("Test message",
+					Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
 			.build();
 
 		// Simulate incoming request

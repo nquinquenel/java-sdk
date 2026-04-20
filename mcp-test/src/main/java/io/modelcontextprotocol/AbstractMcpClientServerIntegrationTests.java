@@ -162,16 +162,15 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var createMessageRequest = McpSchema.CreateMessageRequest.builder()
-					.messages(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
-							new McpSchema.TextContent("Test message"))))
+				var createMessageRequest = McpSchema.CreateMessageRequest
+					.builder(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
+							new McpSchema.TextContent("Test message"))), 1000)
 					.modelPreferences(ModelPreferences.builder()
 						.hints(List.of())
 						.costPriority(1.0)
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
-					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest)
@@ -242,16 +241,15 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var createMessageRequest = McpSchema.CreateMessageRequest.builder()
-					.messages(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
-							new McpSchema.TextContent("Test message"))))
+				var createMessageRequest = McpSchema.CreateMessageRequest
+					.builder(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
+							new McpSchema.TextContent("Test message"))), 1000)
 					.modelPreferences(ModelPreferences.builder()
 						.hints(List.of())
 						.costPriority(1.0)
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
-					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest)
@@ -318,16 +316,15 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var createMessageRequest = McpSchema.CreateMessageRequest.builder()
-					.messages(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
-							new McpSchema.TextContent("Test message"))))
+				var createMessageRequest = McpSchema.CreateMessageRequest
+					.builder(List.of(new McpSchema.SamplingMessage(McpSchema.Role.USER,
+							new McpSchema.TextContent("Test message"))), 1000)
 					.modelPreferences(ModelPreferences.builder()
 						.hints(List.of())
 						.costPriority(1.0)
 						.speedPriority(1.0)
 						.intelligencePriority(1.0)
 						.build())
-					.maxTokens(1000)
 					.build();
 
 				return exchange.createMessage(createMessageRequest).thenReturn(callResponse);
@@ -415,9 +412,8 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var elicitationRequest = McpSchema.ElicitRequest.builder()
-					.message("Test message")
-					.requestedSchema(
+				var elicitationRequest = McpSchema.ElicitRequest
+					.builder("Test message",
 							Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
 					.build();
 
@@ -474,9 +470,8 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var elicitationRequest = McpSchema.ElicitRequest.builder()
-					.message("Test message")
-					.requestedSchema(
+				var elicitationRequest = McpSchema.ElicitRequest
+					.builder("Test message",
 							Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
 					.build();
 
@@ -545,9 +540,8 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 			.tool(Tool.builder().name("tool1").description("tool1 description").inputSchema(EMPTY_JSON_SCHEMA).build())
 			.callHandler((exchange, request) -> {
 
-				var elicitationRequest = ElicitRequest.builder()
-					.message("Test message")
-					.requestedSchema(
+				var elicitationRequest = ElicitRequest
+					.builder("Test message",
 							Map.of("type", "object", "properties", Map.of("message", Map.of("type", "string"))))
 					.build();
 
@@ -1116,34 +1110,29 @@ public abstract class AbstractMcpClientServerIntegrationTests {
 
 			//@formatter:off
 					return exchange // This should be filtered out (DEBUG < NOTICE)
-						.loggingNotification(McpSchema.LoggingMessageNotification.builder()
-								.level(McpSchema.LoggingLevel.DEBUG)
+						.loggingNotification(McpSchema.LoggingMessageNotification
+								.builder(McpSchema.LoggingLevel.DEBUG, "Debug message")
 								.logger("test-logger")
-								.data("Debug message")
 								.build())
 					.then(exchange // This should be sent (NOTICE >= NOTICE)
-						.loggingNotification(McpSchema.LoggingMessageNotification.builder()
-								.level(McpSchema.LoggingLevel.NOTICE)
+						.loggingNotification(McpSchema.LoggingMessageNotification
+								.builder(McpSchema.LoggingLevel.NOTICE, "Notice message")
 								.logger("test-logger")
-								.data("Notice message")
 								.build()))
 					.then(exchange // This should be sent (ERROR > NOTICE)
-						.loggingNotification(McpSchema.LoggingMessageNotification.builder()
-							.level(McpSchema.LoggingLevel.ERROR)
+						.loggingNotification(McpSchema.LoggingMessageNotification
+							.builder(McpSchema.LoggingLevel.ERROR, "Error message")
 							.logger("test-logger")
-							.data("Error message")
 							.build()))
 					.then(exchange // This should be filtered out (INFO < NOTICE)
-						.loggingNotification(McpSchema.LoggingMessageNotification.builder()
-								.level(McpSchema.LoggingLevel.INFO)
+						.loggingNotification(McpSchema.LoggingMessageNotification
+								.builder(McpSchema.LoggingLevel.INFO, "Another info message")
 								.logger("test-logger")
-								.data("Another info message")
 								.build()))
 					.then(exchange // This should be sent (ERROR >= NOTICE)
-						.loggingNotification(McpSchema.LoggingMessageNotification.builder()
-								.level(McpSchema.LoggingLevel.ERROR)
+						.loggingNotification(McpSchema.LoggingMessageNotification
+								.builder(McpSchema.LoggingLevel.ERROR, "Another error message")
 								.logger("test-logger")
-								.data("Another error message")
 								.build()))
 					.thenReturn(CallToolResult.builder()
 						.content(List.of(new McpSchema.TextContent("Logging test completed")))

@@ -77,9 +77,9 @@ The `Tool` record now models `inputSchema` (and `outputSchema`) as arbitrary JSO
 - Java code that used `Tool.inputSchema()` as a `JsonSchema` must switch to `Map<String, Object>` (or copy into your own schema wrapper).
 - `Tool.Builder.inputSchema(JsonSchema)` remains as a **deprecated** helper that maps the old record into a map; prefer `inputSchema(Map)` or `inputSchema(McpJsonMapper, String)`.
 
-### Required MCP spec fields are now guarded against `null` at construction time
+### Required MCP spec fields are enforced at construction time; builders require them upfront
 
-The following records now assert that their required fields (as mandated by the MCP specification) are non-null at construction time. Passing `null` for any of these fields throws `IllegalArgumentException` immediately, rather than producing a structurally invalid object that fails later during serialization or protocol handling.
+The following records assert that their required fields are non-null at construction time. Passing `null` throws `IllegalArgumentException` immediately, rather than producing a structurally invalid object that fails later during serialization or protocol handling.
 
 | Record | Required (non-null) fields |
 |--------|---------------------------|
@@ -91,9 +91,24 @@ The following records now assert that their required fields (as mandated by the 
 | `ProgressNotification` | `progressToken`, `progress` |
 | `LoggingMessageNotification` | `level`, `data` |
 
-**Action:** Audit any code that constructs these records with potentially-null values and provide valid, non-null arguments. Code paths that previously silently produced malformed wire messages will now fail fast at the construction site.
+**Action:** Audit any code that constructs these records with potentially-null values and provide valid, non-null arguments.
 
-**Note on `LoggingMessageNotification.level`:** Because `LoggingLevel` deserialization is lenient (unknown strings produce `null` — see the section above), inbound notifications with an unrecognized level will fail to deserialize into a `LoggingMessageNotification`. Ensure clients and servers send only recognized level strings.
+#### Builder API changes
+
+The builder factory methods for several records now require the mandatory fields as arguments, making it impossible to obtain a builder that is already missing required state. The old no-arg `builder()` factory and the public no-arg `Builder()` constructor are deprecated and will be removed in a future release.
+
+| Type | Old (deprecated) | New |
+|------|-----------------|-----|
+| `CreateMessageRequest` | `CreateMessageRequest.builder().messages(m).maxTokens(n)` | `CreateMessageRequest.builder(m, n)` |
+| `ElicitRequest` | `ElicitRequest.builder().message(m).requestedSchema(s)` | `ElicitRequest.builder(m, s)` |
+| `LoggingMessageNotification` | `LoggingMessageNotification.builder().level(l).data(d)` | `LoggingMessageNotification.builder(l, d)` |
+
+Two records that previously had no builder now have one with the same required-first convention:
+
+- `ProgressNotification.builder(progressToken, progress)` — optional: `.total(Double)`, `.message(String)`, `.meta(Map)`
+- `JSONRPCResponse.JSONRPCError.builder(code, message)` — optional: `.data(Object)`
+
+**Note:** `LoggingMessageNotification.level` must never be `null`. Because `LoggingLevel` deserialization is lenient (see the `LoggingLevel` section above), callers should ensure clients and servers send only recognized level strings.
 
 ### Optional JSON Schema validation on `tools/call` (server)
 
