@@ -237,15 +237,14 @@ public class ConformanceServlet {
 					.callHandler((exchange, request) -> {
 						logger.info("Tool 'test_tool_with_logging' called");
 						// Send log notifications
-						exchange.loggingNotification(LoggingMessageNotification
-							.builder(LoggingLevel.INFO, "Tool execution started")
-							.build());
-						exchange.loggingNotification(LoggingMessageNotification
-							.builder(LoggingLevel.INFO, "Tool processing data")
-							.build());
-						exchange.loggingNotification(LoggingMessageNotification
-							.builder(LoggingLevel.INFO, "Tool execution completed")
-							.build());
+						exchange.loggingNotification(
+								LoggingMessageNotification.builder(LoggingLevel.INFO, "Tool execution started")
+									.build());
+						exchange.loggingNotification(
+								LoggingMessageNotification.builder(LoggingLevel.INFO, "Tool processing data").build());
+						exchange.loggingNotification(
+								LoggingMessageNotification.builder(LoggingLevel.INFO, "Tool execution completed")
+									.build());
 						return CallToolResult.builder()
 							.content(List.of(new TextContent("Tool execution completed with logging")))
 							.isError(false)
