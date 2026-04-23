@@ -93,6 +93,10 @@ The following records assert that their required fields are non-null at construc
 
 **Action:** Audit any code that constructs these records with potentially-null values and provide valid, non-null arguments.
 
+**Wire deserialization is lenient**
+
+Deserialization substitutes safe defaults for absent required fields instead of failing. A `WARN` is logged for every field that was defaulted. `JSONRPCResponse.JSONRPCError` is excluded — malformed JSON-RPC error envelopes still fail immediately.
+
 #### Builder API changes
 
 The builder factory methods for several records now require the mandatory fields as arguments, making it impossible to obtain a builder that is already missing required state. The old no-arg `builder()` factory and the public no-arg `Builder()` constructor are deprecated and will be removed in a future release.
@@ -108,7 +112,7 @@ Two records that previously had no builder now have one with the same required-f
 - `ProgressNotification.builder(progressToken, progress)` — optional: `.total(Double)`, `.message(String)`, `.meta(Map)`
 - `JSONRPCResponse.JSONRPCError.builder(code, message)` — optional: `.data(Object)`
 
-**Note:** `LoggingMessageNotification.level` must never be `null`. Because `LoggingLevel` deserialization is lenient (see the `LoggingLevel` section above), callers should ensure clients and servers send only recognized level strings.
+**Note:** A *missing* `level` field on the wire is handled — it defaults to `INFO` (see the wire-defaults table above). However, an *unrecognized* level string still deserializes to `null` (see the `LoggingLevel` section above), which will then fail the canonical constructor. Ensure clients and servers send only recognized level strings.
 
 ### Optional JSON Schema validation on `tools/call` (server)
 
