@@ -1599,6 +1599,10 @@ public final class McpSchema {
 	 * @param structuredContent An optional JSON object that represents the structured
 	 * result of the tool call.
 	 * @param meta See specification for notes on _meta usage
+	 * <p>
+	 * Note: {@code content} is required by the MCP specification. Deserialization accepts
+	 * a missing value and substitutes an empty list to avoid breaking existing
+	 * integrations that may omit the field.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -1610,6 +1614,17 @@ public final class McpSchema {
 
 		public CallToolResult {
 			Assert.notNull(content, "content must not be null");
+		}
+
+		@JsonCreator
+		static CallToolResult fromJson(@JsonProperty("content") List<Content> content,
+				@JsonProperty("isError") Boolean isError, @JsonProperty("structuredContent") Object structuredContent,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (content == null) {
+				logger.warn("CallToolResult: missing required fields during deserialization: content -> []");
+				content = List.of();
+			}
+			return new CallToolResult(content, isError, structuredContent, meta);
 		}
 
 		/**
@@ -1839,6 +1854,10 @@ public final class McpSchema {
 	 *
 	 * @param role The sender or recipient of messages and data in a conversation
 	 * @param content The content of the message
+	 * <p>
+	 * Note: {@code role} and {@code content} are required by the MCP specification.
+	 * Deserialization accepts missing values and substitutes defaults to avoid breaking
+	 * existing integrations that may omit these fields.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -1849,6 +1868,24 @@ public final class McpSchema {
 		public SamplingMessage {
 			Assert.notNull(role, "role must not be null");
 			Assert.notNull(content, "content must not be null");
+		}
+
+		@JsonCreator
+		static SamplingMessage fromJson(@JsonProperty("role") Role role, @JsonProperty("content") Content content) {
+			if (role == null || content == null) {
+				List<String> missing = new ArrayList<>();
+				if (role == null) {
+					missing.add("role -> 'user'");
+					role = Role.USER;
+				}
+				if (content == null) {
+					missing.add("content -> ''");
+					content = new TextContent("");
+				}
+				logger.warn("SamplingMessage: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new SamplingMessage(role, content);
 		}
 	}
 
@@ -1873,6 +1910,10 @@ public final class McpSchema {
 	 * @param metadata Optional metadata to pass through to the LLM provider. The format
 	 * of this metadata is provider-specific
 	 * @param meta See specification for notes on _meta usage
+	 * <p>
+	 * Note: {@code messages} and {@code maxTokens} are required by the MCP specification.
+	 * Deserialization accepts missing values and substitutes defaults to avoid breaking
+	 * existing integrations that may omit these fields.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -1890,6 +1931,32 @@ public final class McpSchema {
 		public CreateMessageRequest {
 			Assert.notNull(messages, "messages must not be null");
 			Assert.notNull(maxTokens, "maxTokens must not be null");
+		}
+
+		@JsonCreator
+		static CreateMessageRequest fromJson(@JsonProperty("messages") List<SamplingMessage> messages,
+				@JsonProperty("modelPreferences") ModelPreferences modelPreferences,
+				@JsonProperty("systemPrompt") String systemPrompt,
+				@JsonProperty("includeContext") ContextInclusionStrategy includeContext,
+				@JsonProperty("temperature") Double temperature, @JsonProperty("maxTokens") Integer maxTokens,
+				@JsonProperty("stopSequences") List<String> stopSequences,
+				@JsonProperty("metadata") Map<String, Object> metadata,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (messages == null || maxTokens == null) {
+				List<String> missing = new ArrayList<>();
+				if (messages == null) {
+					missing.add("messages -> []");
+					messages = List.of();
+				}
+				if (maxTokens == null) {
+					missing.add("maxTokens -> 0");
+					maxTokens = 0;
+				}
+				logger.warn("CreateMessageRequest: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new CreateMessageRequest(messages, modelPreferences, systemPrompt, includeContext, temperature,
+					maxTokens, stopSequences, metadata, meta);
 		}
 
 		// backwards compatibility constructor
@@ -2136,6 +2203,10 @@ public final class McpSchema {
 	 * @param requestedSchema A restricted subset of JSON Schema. Only top-level
 	 * properties are allowed, without nesting
 	 * @param meta See specification for notes on _meta usage
+	 * <p>
+	 * Note: {@code message} and {@code requestedSchema} are required by the MCP
+	 * specification. Deserialization accepts missing values and substitutes defaults to
+	 * avoid breaking existing integrations that may omit these fields.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -2147,6 +2218,26 @@ public final class McpSchema {
 		public ElicitRequest {
 			Assert.notNull(message, "message must not be null");
 			Assert.notNull(requestedSchema, "requestedSchema must not be null");
+		}
+
+		@JsonCreator
+		static ElicitRequest fromJson(@JsonProperty("message") String message,
+				@JsonProperty("requestedSchema") Map<String, Object> requestedSchema,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (message == null || requestedSchema == null) {
+				List<String> missing = new ArrayList<>();
+				if (message == null) {
+					missing.add("message -> ''");
+					message = "";
+				}
+				if (requestedSchema == null) {
+					missing.add("requestedSchema -> {}");
+					requestedSchema = Map.of();
+				}
+				logger.warn("ElicitRequest: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new ElicitRequest(message, requestedSchema, meta);
 		}
 
 		// backwards compatibility constructor
@@ -2340,6 +2431,10 @@ public final class McpSchema {
 	 * @param total An optional total amount of work to be done, if known.
 	 * @param message An optional message providing additional context about the progress.
 	 * @param meta See specification for notes on _meta usage
+	 * <p>
+	 * Note: {@code progressToken} and {@code progress} are required by the MCP
+	 * specification. Deserialization accepts missing values and substitutes defaults to
+	 * avoid breaking existing integrations that may omit these fields.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -2353,6 +2448,26 @@ public final class McpSchema {
 		public ProgressNotification {
 			Assert.notNull(progressToken, "progressToken must not be null");
 			Assert.notNull(progress, "progress must not be null");
+		}
+
+		@JsonCreator
+		static ProgressNotification fromJson(@JsonProperty("progressToken") Object progressToken,
+				@JsonProperty("progress") Double progress, @JsonProperty("total") Double total,
+				@JsonProperty("message") String message, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (progressToken == null || progress == null) {
+				List<String> missing = new ArrayList<>();
+				if (progressToken == null) {
+					missing.add("progressToken -> ''");
+					progressToken = "";
+				}
+				if (progress == null) {
+					missing.add("progress -> 0.0");
+					progress = 0.0;
+				}
+				logger.warn("ProgressNotification: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new ProgressNotification(progressToken, progress, total, message, meta);
 		}
 
 		public ProgressNotification(Object progressToken, double progress, Double total, String message) {
@@ -2432,6 +2547,10 @@ public final class McpSchema {
 	 * @param logger The logger that generated the message.
 	 * @param data JSON-serializable logging data.
 	 * @param meta See specification for notes on _meta usage
+	 * <p>
+	 * Note: {@code level} and {@code data} are required by the MCP specification.
+	 * Deserialization accepts missing values and substitutes defaults to avoid breaking
+	 * existing integrations that may omit these fields.
 	 */
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -2444,6 +2563,26 @@ public final class McpSchema {
 		public LoggingMessageNotification {
 			Assert.notNull(level, "level must not be null");
 			Assert.notNull(data, "data must not be null");
+		}
+
+		@JsonCreator
+		static LoggingMessageNotification fromJson(@JsonProperty("level") LoggingLevel level,
+				@JsonProperty("logger") String loggerName, @JsonProperty("data") String data,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (level == null || data == null) {
+				List<String> missing = new ArrayList<>();
+				if (level == null) {
+					missing.add("level -> INFO");
+					level = LoggingLevel.INFO;
+				}
+				if (data == null) {
+					missing.add("data -> ''");
+					data = "";
+				}
+				McpSchema.logger.warn("LoggingMessageNotification: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new LoggingMessageNotification(level, loggerName, data, meta);
 		}
 
 		// backwards compatibility constructor

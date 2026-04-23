@@ -1346,6 +1346,16 @@ public class McpSchemaTests {
 					{"content":[{"type":"text","text":"Error: Operation failed"}],"isError":true}"""));
 	}
 
+	@Test
+	void testCallToolResultDeserializationWithMissingContent() throws Exception {
+		McpSchema.CallToolResult result = JSON_MAPPER.readValue("""
+				{"isError":false}""", McpSchema.CallToolResult.class);
+
+		assertThat(result).isNotNull();
+		assertThat(result.content()).isEmpty();
+		assertThat(result.isError()).isFalse();
+	}
+
 	// Sampling Tests
 
 	@Test
@@ -1380,6 +1390,26 @@ public class McpSchemaTests {
 			.isEqualTo(
 					json("""
 							{"messages":[{"role":"user","content":{"type":"text","text":"User message"}}],"modelPreferences":{"hints":[{"name":"gpt-4"}],"costPriority":0.3,"speedPriority":0.7,"intelligencePriority":0.9},"systemPrompt":"You are a helpful assistant","includeContext":"thisServer","temperature":0.7,"maxTokens":1000,"stopSequences":["STOP","END"],"metadata":{"session":"test-session"}}"""));
+	}
+
+	@Test
+	void testSamplingMessageDeserializationWithMissingFields() throws Exception {
+		McpSchema.SamplingMessage message = JSON_MAPPER.readValue("{}", McpSchema.SamplingMessage.class);
+
+		assertThat(message).isNotNull();
+		assertThat(message.role()).isEqualTo(McpSchema.Role.USER);
+		assertThat(message.content()).isInstanceOf(McpSchema.TextContent.class);
+	}
+
+	@Test
+	void testCreateMessageRequestDeserializationWithMissingRequiredFields() throws Exception {
+		McpSchema.CreateMessageRequest request = JSON_MAPPER.readValue("""
+				{"systemPrompt":"hello"}""", McpSchema.CreateMessageRequest.class);
+
+		assertThat(request).isNotNull();
+		assertThat(request.messages()).isEmpty();
+		assertThat(request.maxTokens()).isZero();
+		assertThat(request.systemPrompt()).isEqualTo("hello");
 	}
 
 	@Test
@@ -1453,6 +1483,15 @@ public class McpSchemaTests {
 			.isObject()
 			.isEqualTo(json("""
 					{"action":"accept","content":{"foo":"bar"}}"""));
+	}
+
+	@Test
+	void testElicitRequestDeserializationWithMissingRequiredFields() throws Exception {
+		McpSchema.ElicitRequest request = JSON_MAPPER.readValue("{}", McpSchema.ElicitRequest.class);
+
+		assertThat(request).isNotNull();
+		assertThat(request.message()).isEmpty();
+		assertThat(request.requestedSchema()).isEmpty();
 	}
 
 	@Test
@@ -1753,6 +1792,17 @@ public class McpSchemaTests {
 	}
 
 	@Test
+	void testProgressNotificationDeserializationWithMissingRequiredFields() throws Exception {
+		McpSchema.ProgressNotification notification = JSON_MAPPER.readValue("""
+				{"total":1.0}""", McpSchema.ProgressNotification.class);
+
+		assertThat(notification).isNotNull();
+		assertThat(notification.progressToken()).isEqualTo("");
+		assertThat(notification.progress()).isZero();
+		assertThat(notification.total()).isEqualTo(1.0);
+	}
+
+	@Test
 	void testProgressNotificationWithoutMessage() throws Exception {
 		McpSchema.ProgressNotification notification = new McpSchema.ProgressNotification("progress-token-789", 0.25,
 				null, null);
@@ -1763,6 +1813,17 @@ public class McpSchemaTests {
 			.isObject()
 			.isEqualTo(json("""
 					{"progressToken":"progress-token-789","progress":0.25}"""));
+	}
+
+	@Test
+	void testLoggingMessageNotificationDeserializationWithMissingRequiredFields() throws Exception {
+		McpSchema.LoggingMessageNotification notification = JSON_MAPPER.readValue("""
+				{"logger":"my-logger"}""", McpSchema.LoggingMessageNotification.class);
+
+		assertThat(notification).isNotNull();
+		assertThat(notification.level()).isEqualTo(McpSchema.LoggingLevel.INFO);
+		assertThat(notification.logger()).isEqualTo("my-logger");
+		assertThat(notification.data()).isEmpty();
 	}
 
 }
