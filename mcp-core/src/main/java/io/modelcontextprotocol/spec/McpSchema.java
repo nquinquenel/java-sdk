@@ -1969,10 +1969,11 @@ public final class McpSchema {
 
 		public enum ContextInclusionStrategy {
 
-			@JsonProperty("none")
-			NONE, @JsonProperty("thisServer")
-			THIS_SERVER, @JsonProperty("allServers")
-			ALL_SERVERS
+		// @formatter:off
+			@JsonProperty("none") NONE,
+			@JsonProperty("thisServer") THIS_SERVER,
+			@JsonProperty("allServers") ALL_SERVERS
+		} // @formatter:on
 
 		}
 
@@ -2107,11 +2108,12 @@ public final class McpSchema {
 
 		public enum StopReason {
 
-			@JsonProperty("endTurn")
-			END_TURN("endTurn"), @JsonProperty("stopSequence")
-			STOP_SEQUENCE("stopSequence"), @JsonProperty("maxTokens")
-			MAX_TOKENS("maxTokens"), @JsonProperty("unknown")
-			UNKNOWN("unknown");
+		// @formatter:off
+			@JsonProperty("endTurn") END_TURN("endTurn"),
+			@JsonProperty("stopSequence") STOP_SEQUENCE("stopSequence"),
+			@JsonProperty("maxTokens") MAX_TOKENS("maxTokens"),
+			@JsonProperty("unknown") UNKNOWN("unknown");
+			// @formatter:on
 
 			private final String value;
 
@@ -2331,12 +2333,11 @@ public final class McpSchema {
 
 		public enum Action {
 
-			@JsonProperty("accept")
-			ACCEPT, @JsonProperty("decline")
-			DECLINE, @JsonProperty("cancel")
-			CANCEL
-
-		}
+		// @formatter:off
+			@JsonProperty("accept") ACCEPT,
+			@JsonProperty("decline") DECLINE,
+			@JsonProperty("cancel") CANCEL
+		} // @formatter:on
 
 		// backwards compatibility constructor
 		public ElicitResult(Action action, Map<String, Object> content) {
