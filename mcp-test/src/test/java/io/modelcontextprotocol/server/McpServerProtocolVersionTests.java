@@ -26,7 +26,8 @@ class McpServerProtocolVersionTests {
 
 	private McpSchema.JSONRPCRequest jsonRpcInitializeRequest(String requestId, String protocolVersion) {
 		return new McpSchema.JSONRPCRequest(McpSchema.JSONRPC_VERSION, McpSchema.METHOD_INITIALIZE, requestId,
-				new McpSchema.InitializeRequest(protocolVersion, null, CLIENT_INFO));
+				new McpSchema.InitializeRequest(protocolVersion, McpSchema.ClientCapabilities.builder().build(),
+						CLIENT_INFO));
 	}
 
 	@Test

@@ -355,6 +355,37 @@ public final class McpSchema {
 		@JsonProperty("clientInfo") Implementation clientInfo,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public InitializeRequest {
+			Assert.notNull(protocolVersion, "protocolVersion must not be null");
+			Assert.notNull(capabilities, "capabilities must not be null");
+			Assert.notNull(clientInfo, "clientInfo must not be null");
+		}
+
+		@JsonCreator
+		static InitializeRequest fromJson(@JsonProperty("protocolVersion") String protocolVersion,
+				@JsonProperty("capabilities") ClientCapabilities capabilities,
+				@JsonProperty("clientInfo") Implementation clientInfo,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (protocolVersion == null || capabilities == null || clientInfo == null) {
+				List<String> missing = new ArrayList<>();
+				if (protocolVersion == null) {
+					missing.add("protocolVersion -> ''");
+					protocolVersion = "";
+				}
+				if (capabilities == null) {
+					missing.add("capabilities -> {}");
+					capabilities = new ClientCapabilities(null, null, null, null);
+				}
+				if (clientInfo == null) {
+					missing.add("clientInfo -> {name='', version=''}");
+					clientInfo = new Implementation("", "");
+				}
+				logger.warn("InitializeRequest: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new InitializeRequest(protocolVersion, capabilities, clientInfo, meta);
+		}
+
 		public InitializeRequest(String protocolVersion, ClientCapabilities capabilities, Implementation clientInfo) {
 			this(protocolVersion, capabilities, clientInfo, null);
 		}
@@ -383,6 +414,37 @@ public final class McpSchema {
 		@JsonProperty("serverInfo") Implementation serverInfo,
 		@JsonProperty("instructions") String instructions,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public InitializeResult {
+			Assert.notNull(protocolVersion, "protocolVersion must not be null");
+			Assert.notNull(capabilities, "capabilities must not be null");
+			Assert.notNull(serverInfo, "serverInfo must not be null");
+		}
+
+		@JsonCreator
+		static InitializeResult fromJson(@JsonProperty("protocolVersion") String protocolVersion,
+				@JsonProperty("capabilities") ServerCapabilities capabilities,
+				@JsonProperty("serverInfo") Implementation serverInfo,
+				@JsonProperty("instructions") String instructions, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (protocolVersion == null || capabilities == null || serverInfo == null) {
+				List<String> missing = new ArrayList<>();
+				if (protocolVersion == null) {
+					missing.add("protocolVersion -> ''");
+					protocolVersion = "";
+				}
+				if (capabilities == null) {
+					missing.add("capabilities -> {}");
+					capabilities = new ServerCapabilities(null, null, null, null, null, null);
+				}
+				if (serverInfo == null) {
+					missing.add("serverInfo -> {name='', version=''}");
+					serverInfo = new Implementation("", "");
+				}
+				logger.warn("InitializeResult: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new InitializeResult(protocolVersion, capabilities, serverInfo, instructions, meta);
+		}
 
 		public InitializeResult(String protocolVersion, ServerCapabilities capabilities, Implementation serverInfo,
 				String instructions) {
@@ -702,7 +764,31 @@ public final class McpSchema {
 	public record Implementation( // @formatter:off
 		@JsonProperty("name") String name,
 		@JsonProperty("title") String title,
-		@JsonProperty("version") String version) implements Identifier { // @formatter:on			
+		@JsonProperty("version") String version) implements Identifier { // @formatter:on
+
+		public Implementation {
+			Assert.notNull(name, "name must not be null");
+			Assert.notNull(version, "version must not be null");
+		}
+
+		@JsonCreator
+		static Implementation fromJson(@JsonProperty("name") String name, @JsonProperty("title") String title,
+				@JsonProperty("version") String version) {
+			if (name == null || version == null) {
+				List<String> missing = new ArrayList<>();
+				if (name == null) {
+					missing.add("name -> ''");
+					name = "";
+				}
+				if (version == null) {
+					missing.add("version -> ''");
+					version = "";
+				}
+				logger.warn("Implementation: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new Implementation(name, title, version);
+		}
 
 		public Implementation(String name, String version) {
 			this(name, null, version);
@@ -1020,6 +1106,21 @@ public final class McpSchema {
 		@JsonProperty("nextCursor") String nextCursor,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
 
+		public ListResourcesResult {
+			Assert.notNull(resources, "resources must not be null");
+		}
+
+		@JsonCreator
+		static ListResourcesResult fromJson(@JsonProperty("resources") List<Resource> resources,
+				@JsonProperty("nextCursor") String nextCursor, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (resources == null) {
+				logger.warn(
+						"ListResourcesResult: missing required field 'resources' during deserialization, using default []");
+				resources = List.of();
+			}
+			return new ListResourcesResult(resources, nextCursor, meta);
+		}
+
 		public ListResourcesResult(List<Resource> resources, String nextCursor) {
 			this(resources, nextCursor, null);
 		}
@@ -1040,6 +1141,22 @@ public final class McpSchema {
 		@JsonProperty("nextCursor") String nextCursor,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
 
+		public ListResourceTemplatesResult {
+			Assert.notNull(resourceTemplates, "resourceTemplates must not be null");
+		}
+
+		@JsonCreator
+		static ListResourceTemplatesResult fromJson(
+				@JsonProperty("resourceTemplates") List<ResourceTemplate> resourceTemplates,
+				@JsonProperty("nextCursor") String nextCursor, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (resourceTemplates == null) {
+				logger.warn(
+						"ListResourceTemplatesResult: missing required field 'resourceTemplates' during deserialization, using default []");
+				resourceTemplates = List.of();
+			}
+			return new ListResourceTemplatesResult(resourceTemplates, nextCursor, meta);
+		}
+
 		public ListResourceTemplatesResult(List<ResourceTemplate> resourceTemplates, String nextCursor) {
 			this(resourceTemplates, nextCursor, null);
 		}
@@ -1058,6 +1175,21 @@ public final class McpSchema {
 		@JsonProperty("uri") String uri,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public ReadResourceRequest {
+			Assert.notNull(uri, "uri must not be null");
+		}
+
+		@JsonCreator
+		static ReadResourceRequest fromJson(@JsonProperty("uri") String uri,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null) {
+				logger
+					.warn("ReadResourceRequest: missing required field 'uri' during deserialization, using default ''");
+				uri = "";
+			}
+			return new ReadResourceRequest(uri, meta);
+		}
+
 		public ReadResourceRequest(String uri) {
 			this(uri, null);
 		}
@@ -1074,6 +1206,21 @@ public final class McpSchema {
 	public record ReadResourceResult( // @formatter:off
 		@JsonProperty("contents") List<ResourceContents> contents,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public ReadResourceResult {
+			Assert.notNull(contents, "contents must not be null");
+		}
+
+		@JsonCreator
+		static ReadResourceResult fromJson(@JsonProperty("contents") List<ResourceContents> contents,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (contents == null) {
+				logger.warn(
+						"ReadResourceResult: missing required field 'contents' during deserialization, using default []");
+				contents = List.of();
+			}
+			return new ReadResourceResult(contents, meta);
+		}
 
 		public ReadResourceResult(List<ResourceContents> contents) {
 			this(contents, null);
@@ -1094,6 +1241,20 @@ public final class McpSchema {
 		@JsonProperty("uri") String uri,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public SubscribeRequest {
+			Assert.notNull(uri, "uri must not be null");
+		}
+
+		@JsonCreator
+		static SubscribeRequest fromJson(@JsonProperty("uri") String uri,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null) {
+				logger.warn("SubscribeRequest: missing required field 'uri' during deserialization, using default ''");
+				uri = "";
+			}
+			return new SubscribeRequest(uri, meta);
+		}
+
 		public SubscribeRequest(String uri) {
 			this(uri, null);
 		}
@@ -1111,6 +1272,21 @@ public final class McpSchema {
 	public record UnsubscribeRequest( // @formatter:off
 		@JsonProperty("uri") String uri,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
+
+		public UnsubscribeRequest {
+			Assert.notNull(uri, "uri must not be null");
+		}
+
+		@JsonCreator
+		static UnsubscribeRequest fromJson(@JsonProperty("uri") String uri,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null) {
+				logger
+					.warn("UnsubscribeRequest: missing required field 'uri' during deserialization, using default ''");
+				uri = "";
+			}
+			return new UnsubscribeRequest(uri, meta);
+		}
 
 		public UnsubscribeRequest(String uri) {
 			this(uri, null);
@@ -1156,6 +1332,30 @@ public final class McpSchema {
 		@JsonProperty("text") String text,
 		@JsonProperty("_meta") Map<String, Object> meta) implements ResourceContents { // @formatter:on
 
+		public TextResourceContents {
+			Assert.notNull(uri, "uri must not be null");
+			Assert.notNull(text, "text must not be null");
+		}
+
+		@JsonCreator
+		static TextResourceContents fromJson(@JsonProperty("uri") String uri, @JsonProperty("mimeType") String mimeType,
+				@JsonProperty("text") String text, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null || text == null) {
+				List<String> missing = new ArrayList<>();
+				if (uri == null) {
+					missing.add("uri -> ''");
+					uri = "";
+				}
+				if (text == null) {
+					missing.add("text -> ''");
+					text = "";
+				}
+				logger.warn("TextResourceContents: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new TextResourceContents(uri, mimeType, text, meta);
+		}
+
 		public TextResourceContents(String uri, String mimeType, String text) {
 			this(uri, mimeType, text, null);
 		}
@@ -1178,6 +1378,30 @@ public final class McpSchema {
 		@JsonProperty("mimeType") String mimeType,
 		@JsonProperty("blob") String blob,
 		@JsonProperty("_meta") Map<String, Object> meta) implements ResourceContents { // @formatter:on
+
+		public BlobResourceContents {
+			Assert.notNull(uri, "uri must not be null");
+			Assert.notNull(blob, "blob must not be null");
+		}
+
+		@JsonCreator
+		static BlobResourceContents fromJson(@JsonProperty("uri") String uri, @JsonProperty("mimeType") String mimeType,
+				@JsonProperty("blob") String blob, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null || blob == null) {
+				List<String> missing = new ArrayList<>();
+				if (uri == null) {
+					missing.add("uri -> ''");
+					uri = "";
+				}
+				if (blob == null) {
+					missing.add("blob -> ''");
+					blob = "";
+				}
+				logger.warn("BlobResourceContents: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new BlobResourceContents(uri, mimeType, blob, meta);
+		}
 
 		public BlobResourceContents(String uri, String mimeType, String blob) {
 			this(uri, mimeType, blob, null);
@@ -1204,6 +1428,22 @@ public final class McpSchema {
 		@JsonProperty("description") String description,
 		@JsonProperty("arguments") List<PromptArgument> arguments,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Identifier { // @formatter:on
+
+		public Prompt {
+			Assert.notNull(name, "name must not be null");
+		}
+
+		@JsonCreator
+		static Prompt fromJson(@JsonProperty("name") String name, @JsonProperty("title") String title,
+				@JsonProperty("description") String description,
+				@JsonProperty("arguments") List<PromptArgument> arguments,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (name == null) {
+				logger.warn("Prompt: missing required field 'name' during deserialization, using default ''");
+				name = "";
+			}
+			return new Prompt(name, title, description, arguments, meta);
+		}
 
 		public Prompt(String name, String description, List<PromptArgument> arguments) {
 			this(name, null, description, arguments, null);
@@ -1249,6 +1489,29 @@ public final class McpSchema {
 	public record PromptMessage( // @formatter:off
 		@JsonProperty("role") Role role,
 		@JsonProperty("content") Content content) { // @formatter:on
+
+		public PromptMessage {
+			Assert.notNull(role, "role must not be null");
+			Assert.notNull(content, "content must not be null");
+		}
+
+		@JsonCreator
+		static PromptMessage fromJson(@JsonProperty("role") Role role, @JsonProperty("content") Content content) {
+			if (role == null || content == null) {
+				List<String> missing = new ArrayList<>();
+				if (role == null) {
+					missing.add("role -> 'user'");
+					role = Role.USER;
+				}
+				if (content == null) {
+					missing.add("content -> ''");
+					content = new TextContent("");
+				}
+				logger.warn("PromptMessage: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new PromptMessage(role, content);
+		}
 	}
 
 	/**
@@ -1265,6 +1528,21 @@ public final class McpSchema {
 		@JsonProperty("prompts") List<Prompt> prompts,
 		@JsonProperty("nextCursor") String nextCursor,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result  { // @formatter:on
+
+		public ListPromptsResult {
+			Assert.notNull(prompts, "prompts must not be null");
+		}
+
+		@JsonCreator
+		static ListPromptsResult fromJson(@JsonProperty("prompts") List<Prompt> prompts,
+				@JsonProperty("nextCursor") String nextCursor, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (prompts == null) {
+				logger.warn(
+						"ListPromptsResult: missing required field 'prompts' during deserialization, using default []");
+				prompts = List.of();
+			}
+			return new ListPromptsResult(prompts, nextCursor, meta);
+		}
 
 		public ListPromptsResult(List<Prompt> prompts, String nextCursor) {
 			this(prompts, nextCursor, null);
@@ -1285,6 +1563,21 @@ public final class McpSchema {
 		@JsonProperty("arguments") Map<String, Object> arguments,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public GetPromptRequest {
+			Assert.notNull(name, "name must not be null");
+		}
+
+		@JsonCreator
+		static GetPromptRequest fromJson(@JsonProperty("name") String name,
+				@JsonProperty("arguments") Map<String, Object> arguments,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (name == null) {
+				logger.warn("GetPromptRequest: missing required field 'name' during deserialization, using default ''");
+				name = "";
+			}
+			return new GetPromptRequest(name, arguments, meta);
+		}
+
 		public GetPromptRequest(String name, Map<String, Object> arguments) {
 			this(name, arguments, null);
 		}
@@ -1303,6 +1596,22 @@ public final class McpSchema {
 		@JsonProperty("description") String description,
 		@JsonProperty("messages") List<PromptMessage> messages,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public GetPromptResult {
+			Assert.notNull(messages, "messages must not be null");
+		}
+
+		@JsonCreator
+		static GetPromptResult fromJson(@JsonProperty("description") String description,
+				@JsonProperty("messages") List<PromptMessage> messages,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (messages == null) {
+				logger.warn(
+						"GetPromptResult: missing required field 'messages' during deserialization, using default []");
+				messages = List.of();
+			}
+			return new GetPromptResult(description, messages, meta);
+		}
 
 		public GetPromptResult(String description, List<PromptMessage> messages) {
 			this(description, messages, null);
@@ -1326,6 +1635,20 @@ public final class McpSchema {
 		@JsonProperty("tools") List<Tool> tools,
 		@JsonProperty("nextCursor") String nextCursor,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public ListToolsResult {
+			Assert.notNull(tools, "tools must not be null");
+		}
+
+		@JsonCreator
+		static ListToolsResult fromJson(@JsonProperty("tools") List<Tool> tools,
+				@JsonProperty("nextCursor") String nextCursor, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (tools == null) {
+				logger.warn("ListToolsResult: missing required field 'tools' during deserialization, using default []");
+				tools = List.of();
+			}
+			return new ListToolsResult(tools, nextCursor, meta);
+		}
 
 		public ListToolsResult(List<Tool> tools, String nextCursor) {
 			this(tools, nextCursor, null);
@@ -1404,8 +1727,43 @@ public final class McpSchema {
 		@JsonProperty("annotations") ToolAnnotations annotations,
 		@JsonProperty("_meta") Map<String, Object> meta) { // @formatter:on
 
+		public Tool {
+			Assert.notNull(name, "name must not be null");
+			Assert.notNull(inputSchema, "inputSchema must not be null");
+		}
+
+		@JsonCreator
+		static Tool fromJson(@JsonProperty("name") String name, @JsonProperty("title") String title,
+				@JsonProperty("description") String description,
+				@JsonProperty("inputSchema") Map<String, Object> inputSchema,
+				@JsonProperty("outputSchema") Map<String, Object> outputSchema,
+				@JsonProperty("annotations") ToolAnnotations annotations,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (name == null || inputSchema == null) {
+				List<String> missing = new ArrayList<>();
+				if (name == null) {
+					missing.add("name -> ''");
+					name = "";
+				}
+				if (inputSchema == null) {
+					missing.add("inputSchema -> {}");
+					inputSchema = Map.of();
+				}
+				logger.warn("Tool: missing required fields during deserialization: {}", String.join(", ", missing));
+			}
+			return new Tool(name, title, description, inputSchema, outputSchema, annotations, meta);
+		}
+
+		/**
+		 * @deprecated Use {@link #builder(String)} instead.
+		 */
+		@Deprecated
 		public static Builder builder() {
 			return new Builder();
+		}
+
+		public static Builder builder(String name) {
+			return new Builder(name);
 		}
 
 		public static class Builder {
@@ -1423,6 +1781,18 @@ public final class McpSchema {
 			private ToolAnnotations annotations;
 
 			private Map<String, Object> meta;
+
+			/**
+			 * @deprecated Use {@link Tool#builder(String)} instead.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
+			private Builder(String name) {
+				Assert.hasText(name, "name must not be empty");
+				this.name = name;
+			}
 
 			public Builder name(String name) {
 				this.name = name;
@@ -1492,6 +1862,9 @@ public final class McpSchema {
 
 			public Tool build() {
 				Assert.hasText(name, "name must not be empty");
+				if (inputSchema == null) {
+					inputSchema = Map.of("type", "object");
+				}
 				return new Tool(name, title, description, inputSchema, outputSchema, annotations, meta);
 			}
 
@@ -1524,6 +1897,21 @@ public final class McpSchema {
 		@JsonProperty("arguments") Map<String, Object> arguments,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Request { // @formatter:on
 
+		public CallToolRequest {
+			Assert.notNull(name, "name must not be null");
+		}
+
+		@JsonCreator
+		static CallToolRequest fromJson(@JsonProperty("name") String name,
+				@JsonProperty("arguments") Map<String, Object> arguments,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (name == null) {
+				logger.warn("CallToolRequest: missing required field 'name' during deserialization, using default ''");
+				name = "";
+			}
+			return new CallToolRequest(name, arguments, meta);
+		}
+
 		public CallToolRequest(McpJsonMapper jsonMapper, String name, String jsonArguments) {
 			this(name, parseJsonArguments(jsonMapper, jsonArguments), null);
 		}
@@ -1541,8 +1929,16 @@ public final class McpSchema {
 			}
 		}
 
+		/**
+		 * @deprecated Use {@link #builder(String)} instead.
+		 */
+		@Deprecated
 		public static Builder builder() {
 			return new Builder();
+		}
+
+		public static Builder builder(String name) {
+			return new Builder(name);
 		}
 
 		public static class Builder {
@@ -1552,6 +1948,18 @@ public final class McpSchema {
 			private Map<String, Object> arguments;
 
 			private Map<String, Object> meta;
+
+			/**
+			 * @deprecated Use {@link CallToolRequest#builder(String)} instead.
+			 */
+			@Deprecated
+			public Builder() {
+			}
+
+			private Builder(String name) {
+				Assert.hasText(name, "name must not be empty");
+				this.name = name;
+			}
 
 			public Builder name(String name) {
 				this.name = name;
@@ -1975,8 +2383,6 @@ public final class McpSchema {
 			@JsonProperty("allServers") ALL_SERVERS
 		} // @formatter:on
 
-		}
-
 		/**
 		 * @deprecated Use {@link #builder(List, int)} instead.
 		 */
@@ -2078,6 +2484,8 @@ public final class McpSchema {
 			}
 
 			public CreateMessageRequest build() {
+				Assert.notNull(messages, "messages must not be null");
+				Assert.notNull(maxTokens, "maxTokens must not be null");
 				return new CreateMessageRequest(messages, modelPreferences, systemPrompt, includeContext, temperature,
 						maxTokens, stopSequences, metadata, meta);
 			}
@@ -2105,6 +2513,36 @@ public final class McpSchema {
 		@JsonProperty("model") String model,
 		@JsonProperty("stopReason") StopReason stopReason,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public CreateMessageResult {
+			Assert.notNull(role, "role must not be null");
+			Assert.notNull(content, "content must not be null");
+			Assert.notNull(model, "model must not be null");
+		}
+
+		@JsonCreator
+		static CreateMessageResult fromJson(@JsonProperty("role") Role role, @JsonProperty("content") Content content,
+				@JsonProperty("model") String model, @JsonProperty("stopReason") StopReason stopReason,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (role == null || content == null || model == null) {
+				List<String> missing = new ArrayList<>();
+				if (role == null) {
+					missing.add("role -> 'assistant'");
+					role = Role.ASSISTANT;
+				}
+				if (content == null) {
+					missing.add("content -> ''");
+					content = new TextContent("");
+				}
+				if (model == null) {
+					missing.add("model -> ''");
+					model = "";
+				}
+				logger.warn("CreateMessageResult: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new CreateMessageResult(role, content, model, stopReason, meta);
+		}
 
 		public enum StopReason {
 
@@ -2190,6 +2628,8 @@ public final class McpSchema {
 			}
 
 			public CreateMessageResult build() {
+				Assert.notNull(content, "content must not be null");
+				Assert.notNull(model, "model must not be null");
 				return new CreateMessageResult(role, content, model, stopReason, meta);
 			}
 
@@ -2308,6 +2748,8 @@ public final class McpSchema {
 			}
 
 			public ElicitRequest build() {
+				Assert.notNull(message, "message must not be null");
+				Assert.notNull(requestedSchema, "requestedSchema must not be null");
 				return new ElicitRequest(message, requestedSchema, meta);
 			}
 
@@ -2330,6 +2772,21 @@ public final class McpSchema {
 		@JsonProperty("action") Action action,
 		@JsonProperty("content") Map<String, Object> content,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public ElicitResult {
+			Assert.notNull(action, "action must not be null");
+		}
+
+		@JsonCreator
+		static ElicitResult fromJson(@JsonProperty("action") Action action,
+				@JsonProperty("content") Map<String, Object> content, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (action == null) {
+				logger.warn(
+						"ElicitResult: missing required field 'action' during deserialization, using default 'cancel'");
+				action = Action.CANCEL;
+			}
+			return new ElicitResult(action, content, meta);
+		}
 
 		public enum Action {
 
@@ -2372,6 +2829,7 @@ public final class McpSchema {
 			}
 
 			public ElicitResult build() {
+				Assert.notNull(action, "action must not be null");
 				return new ElicitResult(action, content, meta);
 			}
 
@@ -2533,6 +2991,21 @@ public final class McpSchema {
 		@JsonProperty("uri") String uri,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Notification { // @formatter:on
 
+		public ResourcesUpdatedNotification {
+			Assert.notNull(uri, "uri must not be null");
+		}
+
+		@JsonCreator
+		static ResourcesUpdatedNotification fromJson(@JsonProperty("uri") String uri,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null) {
+				logger.warn(
+						"ResourcesUpdatedNotification: missing required field 'uri' during deserialization, using default ''");
+				uri = "";
+			}
+			return new ResourcesUpdatedNotification(uri, meta);
+		}
+
 		public ResourcesUpdatedNotification(String uri) {
 			this(uri, null);
 		}
@@ -2652,6 +3125,7 @@ public final class McpSchema {
 			}
 
 			public LoggingMessageNotification build() {
+				Assert.notNull(data, "data must not be null");
 				return new LoggingMessageNotification(level, logger, data, meta);
 			}
 
@@ -2713,6 +3187,20 @@ public final class McpSchema {
 	@JsonInclude(JsonInclude.Include.NON_ABSENT)
 	@JsonIgnoreProperties(ignoreUnknown = true)
 	public record SetLevelRequest(@JsonProperty("level") LoggingLevel level) {
+
+		public SetLevelRequest {
+			Assert.notNull(level, "level must not be null");
+		}
+
+		@JsonCreator
+		static SetLevelRequest fromJson(@JsonProperty("level") LoggingLevel level) {
+			if (level == null) {
+				logger.warn(
+						"SetLevelRequest: missing required field 'level' during deserialization, using default 'info'");
+				level = LoggingLevel.INFO;
+			}
+			return new SetLevelRequest(level);
+		}
 	}
 
 	// ---------------------------
@@ -2822,6 +3310,18 @@ public final class McpSchema {
 		@JsonProperty("_meta") Map<String, Object> meta,
 		@JsonProperty("context") CompleteContext context) implements Request { // @formatter:on
 
+		public CompleteRequest {
+			Assert.notNull(ref, "ref must not be null");
+			Assert.notNull(argument, "argument must not be null");
+		}
+
+		@JsonCreator
+		static CompleteRequest fromJson(@JsonProperty("ref") McpSchema.CompleteReference ref,
+				@JsonProperty("argument") CompleteArgument argument, @JsonProperty("_meta") Map<String, Object> meta,
+				@JsonProperty("context") CompleteContext context) {
+			return new CompleteRequest(ref, argument, meta, context);
+		}
+
 		public CompleteRequest(McpSchema.CompleteReference ref, CompleteArgument argument, Map<String, Object> meta) {
 			this(ref, argument, meta, null);
 		}
@@ -2867,6 +3367,21 @@ public final class McpSchema {
 	public record CompleteResult(// @formatter:off
 			@JsonProperty("completion") CompleteCompletion completion,
 			@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public CompleteResult {
+			Assert.notNull(completion, "completion must not be null");
+		}
+
+		@JsonCreator
+		static CompleteResult fromJson(@JsonProperty("completion") CompleteCompletion completion,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (completion == null) {
+				logger.warn(
+						"CompleteResult: missing required field 'completion' during deserialization, using default {values=[]}");
+				completion = new CompleteCompletion(List.of(), null, null);
+			}
+			return new CompleteResult(completion, meta);
+		}
 
 		// backwards compatibility constructor
 		public CompleteResult(CompleteCompletion completion) {
@@ -2947,6 +3462,20 @@ public final class McpSchema {
 		@JsonProperty("text") String text,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Annotated, Content { // @formatter:on
 
+		public TextContent {
+			Assert.notNull(text, "text must not be null");
+		}
+
+		@JsonCreator
+		static TextContent fromJson(@JsonProperty("annotations") Annotations annotations,
+				@JsonProperty("text") String text, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (text == null) {
+				logger.warn("TextContent: missing required field 'text' during deserialization, using default ''");
+				text = "";
+			}
+			return new TextContent(annotations, text, meta);
+		}
+
 		public TextContent(Annotations annotations, String text) {
 			this(annotations, text, null);
 		}
@@ -2973,6 +3502,31 @@ public final class McpSchema {
 		@JsonProperty("mimeType") String mimeType,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Annotated, Content { // @formatter:on
 
+		public ImageContent {
+			Assert.notNull(data, "data must not be null");
+			Assert.notNull(mimeType, "mimeType must not be null");
+		}
+
+		@JsonCreator
+		static ImageContent fromJson(@JsonProperty("annotations") Annotations annotations,
+				@JsonProperty("data") String data, @JsonProperty("mimeType") String mimeType,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (data == null || mimeType == null) {
+				List<String> missing = new ArrayList<>();
+				if (data == null) {
+					missing.add("data -> ''");
+					data = "";
+				}
+				if (mimeType == null) {
+					missing.add("mimeType -> ''");
+					mimeType = "";
+				}
+				logger.warn("ImageContent: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new ImageContent(annotations, data, mimeType, meta);
+		}
+
 		public ImageContent(Annotations annotations, String data, String mimeType) {
 			this(annotations, data, mimeType, null);
 		}
@@ -2994,6 +3548,31 @@ public final class McpSchema {
 		@JsonProperty("data") String data,
 		@JsonProperty("mimeType") String mimeType,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Annotated, Content { // @formatter:on
+
+		public AudioContent {
+			Assert.notNull(data, "data must not be null");
+			Assert.notNull(mimeType, "mimeType must not be null");
+		}
+
+		@JsonCreator
+		static AudioContent fromJson(@JsonProperty("annotations") Annotations annotations,
+				@JsonProperty("data") String data, @JsonProperty("mimeType") String mimeType,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (data == null || mimeType == null) {
+				List<String> missing = new ArrayList<>();
+				if (data == null) {
+					missing.add("data -> ''");
+					data = "";
+				}
+				if (mimeType == null) {
+					missing.add("mimeType -> ''");
+					mimeType = "";
+				}
+				logger.warn("AudioContent: missing required fields during deserialization: {}",
+						String.join(", ", missing));
+			}
+			return new AudioContent(annotations, data, mimeType, meta);
+		}
 
 		// backwards compatibility constructor
 		public AudioContent(Annotations annotations, String data, String mimeType) {
@@ -3017,6 +3596,21 @@ public final class McpSchema {
 		@JsonProperty("annotations") Annotations annotations,
 		@JsonProperty("resource") ResourceContents resource,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Annotated, Content { // @formatter:on
+
+		public EmbeddedResource {
+			Assert.notNull(resource, "resource must not be null");
+		}
+
+		@JsonCreator
+		static EmbeddedResource fromJson(@JsonProperty("annotations") Annotations annotations,
+				@JsonProperty("resource") ResourceContents resource, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (resource == null) {
+				logger.warn(
+						"EmbeddedResource: missing required field 'resource' during deserialization, using empty text resource");
+				resource = new TextResourceContents("", null, "");
+			}
+			return new EmbeddedResource(annotations, resource, meta);
+		}
 
 		// backwards compatibility constructor
 		public EmbeddedResource(Annotations annotations, ResourceContents resource) {
@@ -3147,6 +3741,20 @@ public final class McpSchema {
 		@JsonProperty("name") String name,
 		@JsonProperty("_meta") Map<String, Object> meta) { // @formatter:on
 
+		public Root {
+			Assert.notNull(uri, "uri must not be null");
+		}
+
+		@JsonCreator
+		static Root fromJson(@JsonProperty("uri") String uri, @JsonProperty("name") String name,
+				@JsonProperty("_meta") Map<String, Object> meta) {
+			if (uri == null) {
+				logger.warn("Root: missing required field 'uri' during deserialization, using default ''");
+				uri = "";
+			}
+			return new Root(uri, name, meta);
+		}
+
 		public Root(String uri, String name) {
 			this(uri, name, null);
 		}
@@ -3170,6 +3778,20 @@ public final class McpSchema {
 		@JsonProperty("roots") List<Root> roots,
 		@JsonProperty("nextCursor") String nextCursor,
 		@JsonProperty("_meta") Map<String, Object> meta) implements Result { // @formatter:on
+
+		public ListRootsResult {
+			Assert.notNull(roots, "roots must not be null");
+		}
+
+		@JsonCreator
+		static ListRootsResult fromJson(@JsonProperty("roots") List<Root> roots,
+				@JsonProperty("nextCursor") String nextCursor, @JsonProperty("_meta") Map<String, Object> meta) {
+			if (roots == null) {
+				logger.warn("ListRootsResult: missing required field 'roots' during deserialization, using default []");
+				roots = List.of();
+			}
+			return new ListRootsResult(roots, nextCursor, meta);
+		}
 
 		public ListRootsResult(List<Root> roots) {
 			this(roots, null);

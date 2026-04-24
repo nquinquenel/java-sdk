@@ -138,7 +138,7 @@ class SyncToolSpecificationBuilderTest {
 
 		@Test
 		void defaultShouldThrowOnInvalidName() {
-			Tool invalidTool = Tool.builder().name("invalid tool name").build();
+			Tool invalidTool = Tool.builder().name("invalid tool name").inputSchema(EMPTY_JSON_SCHEMA).build();
 
 			assertThatThrownBy(
 					() -> McpServer.sync(transportProvider).toolCall(invalidTool, (exchange, request) -> null))
@@ -149,7 +149,7 @@ class SyncToolSpecificationBuilderTest {
 		@Test
 		void lenientDefaultShouldLogOnInvalidName() {
 			System.setProperty(ToolNameValidator.STRICT_VALIDATION_PROPERTY, "false");
-			Tool invalidTool = Tool.builder().name("invalid tool name").build();
+			Tool invalidTool = Tool.builder().name("invalid tool name").inputSchema(EMPTY_JSON_SCHEMA).build();
 
 			assertThatCode(() -> McpServer.sync(transportProvider).toolCall(invalidTool, (exchange, request) -> null))
 				.doesNotThrowAnyException();
@@ -158,7 +158,7 @@ class SyncToolSpecificationBuilderTest {
 
 		@Test
 		void lenientConfigurationShouldLogOnInvalidName() {
-			Tool invalidTool = Tool.builder().name("invalid tool name").build();
+			Tool invalidTool = Tool.builder().name("invalid tool name").inputSchema(EMPTY_JSON_SCHEMA).build();
 
 			assertThatCode(() -> McpServer.sync(transportProvider)
 				.strictToolNameValidation(false)
@@ -169,7 +169,7 @@ class SyncToolSpecificationBuilderTest {
 		@Test
 		void serverConfigurationShouldOverrideDefault() {
 			System.setProperty(ToolNameValidator.STRICT_VALIDATION_PROPERTY, "false");
-			Tool invalidTool = Tool.builder().name("invalid tool name").build();
+			Tool invalidTool = Tool.builder().name("invalid tool name").inputSchema(EMPTY_JSON_SCHEMA).build();
 
 			assertThatThrownBy(() -> McpServer.sync(transportProvider)
 				.strictToolNameValidation(true)

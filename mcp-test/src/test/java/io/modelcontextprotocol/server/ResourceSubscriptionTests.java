@@ -37,8 +37,8 @@ class ResourceSubscriptionTests {
 
 	private static McpSchema.JSONRPCRequest initRequest() {
 		return new McpSchema.JSONRPCRequest(McpSchema.JSONRPC_VERSION, McpSchema.METHOD_INITIALIZE,
-				UUID.randomUUID().toString(),
-				new McpSchema.InitializeRequest(ProtocolVersions.MCP_2025_11_25, null, CLIENT_INFO));
+				UUID.randomUUID().toString(), new McpSchema.InitializeRequest(ProtocolVersions.MCP_2025_11_25,
+						McpSchema.ClientCapabilities.builder().build(), CLIENT_INFO));
 	}
 
 	private static McpSchema.JSONRPCNotification initializedNotification() {

@@ -36,7 +36,7 @@ public final class ToolInputValidator {
 	 */
 	public static CallToolResult validate(McpSchema.Tool tool, Map<String, Object> arguments,
 			boolean validateToolInputs, JsonSchemaValidator validator) {
-		if (!validateToolInputs || tool.inputSchema() == null || validator == null) {
+		if (!validateToolInputs || tool.inputSchema() == null || tool.inputSchema().isEmpty() || validator == null) {
 			return null;
 		}
 		Map<String, Object> args = arguments != null ? arguments : Map.of();

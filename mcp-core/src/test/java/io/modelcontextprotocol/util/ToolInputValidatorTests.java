@@ -16,10 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Tests for {@link ToolInputValidator}.
@@ -39,7 +36,10 @@ class ToolInputValidatorTests {
 		.inputSchema(inputSchema)
 		.build();
 
-	private final Tool toolWithoutSchema = Tool.builder().name("test-tool").description("Test tool").build();
+	private final Tool toolWithoutSchema = Tool.builder()
+		.name("test-tool")
+		.description("Test tool")
+		.build();
 
 	@Test
 	void validate_whenDisabled_returnsNull() {
@@ -51,10 +51,12 @@ class ToolInputValidatorTests {
 
 	@Test
 	void validate_whenNoSchema_returnsNull() {
+		when(validator.validate(any(), any())).thenReturn(ValidationResponse.asValid(null));
+
 		CallToolResult result = ToolInputValidator.validate(toolWithoutSchema, Map.of("name", "test"), true, validator);
 
 		assertThat(result).isNull();
-		verify(validator, never()).validate(any(), any());
+		verify(validator).validate(any(), any());
 	}
 
 	@Test

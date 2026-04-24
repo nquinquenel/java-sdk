@@ -7,12 +7,14 @@ package io.modelcontextprotocol.spec;
 import static io.modelcontextprotocol.util.McpJsonMapperUtils.JSON_MAPPER;
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.exc.ValueInstantiationException;
 
 /**
  * Verifies that {@link McpSchema.CompleteReference} polymorphic dispatch works via direct
@@ -80,6 +82,20 @@ class CompleteReferenceJsonTests {
 
 		assertThat(req.ref()).isInstanceOf(McpSchema.PromptReference.class);
 		assertThat(req.ref().identifier()).isEqualTo("my-prompt");
+	}
+
+	@Test
+	void completeRequestMissingRefFailsToInstantiate() throws IOException {
+		String json = """
+				{"argument":{"name":"lang","value":"java"}}
+				""";
+
+		// This is the real in-process path: params arrives as a Map from JSON-RPC
+		Object paramsMap = mapper.readValue(json, Object.class);
+
+		assertThatThrownBy(() -> mapper.convertValue(paramsMap, new TypeRef<McpSchema.CompleteRequest>() {
+		})).isInstanceOf(ValueInstantiationException.class).hasMessageContaining("ref must not be null");
+
 	}
 
 	@Test
